@@ -1,0 +1,6 @@
+HMSET vendingmachine001:slot1 name "Baby Elephants" price 1.25
+HMSET vendingmachine001:slot2 name "Clown Noses" price 0.25
+HMSET vendingmachine001:slot3 name "Cotton Candy" price 0.80
+HMSET vendingmachine001:slot4 name "Juggling Clubs" price 4.25
+HMSET vendingmachine001:slot5 name "Popcorn" price 0.75
+HMSET vendingmachine001:slot6 name "Show Tickets" price 8.25
