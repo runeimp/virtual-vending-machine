@@ -1,0 +1,44 @@
+# File name: KivyVideo7.py
+#:kivy 1.10.0
+
+
+<VendingDisplay>:
+    id: calculator
+    display: amount
+    cols: 3
+    rows: 3
+    padding: 30
+    spacing: 10
+
+    BoxLayout:
+        orientation: 'horizontal'
+        Label:
+            cols: 1
+            rows: 1
+            text: 'Amount'
+            font_size: 24
+            multiline: False
+        TextInput:
+            cols: 2
+            rows: 1
+            id: amount
+            font_size: 24
+            multiline: False
+            text: "$13.75"
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        Button:
+            text: "Baby Elephants"
+        Button:
+            text: "Clown Noses"
+        Button:
+            text: "Cotton Candy"
+        Button:
+            text: "Juggling Clubs"
+        Button:
+            text: "Popcorn"
+        Button:
+            text: "Show Tickets"
+    
