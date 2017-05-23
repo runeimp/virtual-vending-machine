@@ -1,44 +1,56 @@
-# File name: KivyVideo7.py
+# File name: vendingmachine.py
 #:kivy 1.10.0
+
+<CustButton@Button>:
+    font_size: 24
+    halign: 'right'
 
 
 <VendingDisplay>:
     id: calculator
-    display: amount
-    cols: 3
-    rows: 3
-    padding: 30
-    spacing: 10
+    display: credit
+    padding: 20
+    spacing: 20
+    orientation: 'vertical'
 
     BoxLayout:
         orientation: 'horizontal'
+        size_hint_y: None
+        height: 40
+        spacing: 10
+
         Label:
-            cols: 1
-            rows: 1
-            text: 'Amount'
+            text: 'Amount:'
             font_size: 24
             multiline: False
+            size_hint_x: None
+            size_hint_y: None
+            width: 100
+            height: 40
+
         TextInput:
-            cols: 2
-            rows: 1
-            id: amount
+            halign: 'right'
+            readonly: True
+            id: credit
             font_size: 24
             multiline: False
-            text: "$13.75"
+            text: root.amount
+            size_hint_y: None
+            height: 40
 
     BoxLayout:
         orientation: 'vertical'
         spacing: 10
-        Button:
-            text: "Baby Elephants"
-        Button:
-            text: "Clown Noses"
-        Button:
-            text: "Cotton Candy"
-        Button:
-            text: "Juggling Clubs"
-        Button:
-            text: "Popcorn"
-        Button:
-            text: "Show Tickets"
+        CustButton:
+            text: root.slot_1
+        CustButton:
+            text: root.slot_2
+        CustButton:
+            text: root.slot_3
+        CustButton:
+            text: root.slot_4
+        CustButton:
+            text: root.slot_5
+        CustButton:
+            text: root.slot_6
     
