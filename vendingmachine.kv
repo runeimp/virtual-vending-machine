@@ -7,8 +7,8 @@
 
 
 <VendingDisplay>:
-    id: calculator
-    display: credit
+    id: machine
+    # display: amount
     padding: 20
     spacing: 20
     orientation: 'vertical'
@@ -31,7 +31,7 @@
         TextInput:
             halign: 'right'
             readonly: True
-            id: credit
+            id: amount
             font_size: 24
             multiline: False
             text: root.amount

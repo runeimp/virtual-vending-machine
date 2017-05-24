@@ -1,0 +1,43 @@
+# File name: vendingmachine.py
+#:kivy 1.10.0
+
+<CustButton@Button>:
+    font_size: 24
+    halign: 'right'
+
+
+<VendingDisplay>:
+    id: remote
+    padding: 20
+    spacing: 20
+    orientation: 'vertical'
+
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        CustButton:
+            text: root.slots[1]
+            on_press: root.add_item(1)
+        CustButton:
+            text: root.slots[2]
+            on_press: root.add_item(2)
+        CustButton:
+            text: root.slots[3]
+            on_press: root.add_item(3)
+        CustButton:
+            text: root.slots[4]
+            on_press: root.add_item(4)
+        CustButton:
+            text: root.slots[5]
+            on_press: root.add_item(5)
+        CustButton:
+            text: root.slots[6]
+            on_press: root.add_item(6)
+        CustButton:
+            text: 'Add Two Bits'
+            on_press: root.add_two_bits()
+        CustButton:
+            text: 'Purchase'
+            on_press: root.purchase()
+    
