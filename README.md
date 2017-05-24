@@ -7,6 +7,8 @@ Python
 
 ### Vending Machine App
 
+Python3 and Kivy
+
 #### Contents
 
 * Baby Elephants
@@ -20,6 +22,8 @@ Python
 ### Testing App
 
 Make a little tool to communicate with and test your vending machine.  Command-line, web, whatever you like.
+
+Python3 and Kivy
 
 
 Redis
@@ -47,4 +51,10 @@ Testing
 -------
 
 I've setup a Makefile to run tasks. Simply run `make` to get a list of options.
+
+
+"Features"
+---------
+
+The channel handler thread for `vendingremote.py` doesn't close like it's supposed to when the app is closed. Probably need fresh eyes to find the issue.
 

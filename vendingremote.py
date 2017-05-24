@@ -56,10 +56,12 @@ class VendingDisplay(BoxLayout):
 			self.feedback = 'Purchase Complete'
 		elif data == 'clear_feedback':
 			self.feedback = ''
+		elif data == 'low_funds':
+			self.feedback = 'Need More Bits'
 		elif data == 'item_added':
 			self.feedback = 'Item Added'
 		elif data == 'money_added':
-			self.feedback = 'Money Added'
+			self.feedback = 'Bits Added'
 
 
 	def make_purchase(self):

@@ -134,7 +134,7 @@ class VendingMachine(App):
 
 			self.redis.publish('vendingremote-channel', 'purchase_complete')
 		else:
-			self.redis.publish('vendingremote-channel', 'clear_feedback')
+			self.redis.publish('vendingremote-channel', 'low_funds')
 
 
 	def on_pause(self):

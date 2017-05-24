@@ -6,7 +6,8 @@ default:
 
 run:
 	@./term-wipe
-	@make run-remote
+	@
+	make run-remote
 	@make run-machine
 
 
