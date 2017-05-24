@@ -49,47 +49,64 @@ class VendingMachine(App):
 
 
 	def channel_handler(self, message):
-		print("VendingMachine.channel_handler() | message: {}".format(message))
+		# print("VendingMachine.channel_handler() | message: {}".format(message))
 		data = message['data'].decode()
+		print("VendingMachine.channel_handler() | data: {}".format(data))
 		data_match = re.search('add_item_(?P<slot>[0-9]+)', data)
-		print("VendingMachine.channel_handler() | data: {} | slot: {}".format(data, data_match.group('slot')))
 
 		if data == 'add_two_bits':
-			print("  VendingMachine.channel_handler() | amount: {}".format(self.redis.get("vendingmachine001:amount")))
+			# print("  VendingMachine.channel_handler() | amount: {}".format(self.redis.get("vendingmachine001:amount")))
 			result = self.redis.incrbyfloat("vendingmachine001:amount", 0.25)
-			print("  VendingMachine.channel_handler() | result: {}".format(result))
+			# print("  VendingMachine.channel_handler() | result: {}".format(result))
 			self.display.amount = "${:.2f}".format(result)
-		elif data == 'add_item_1':
-			self.add_item(1)
-		elif data == 'add_item_2':
-			self.add_item(2)
-		elif data == 'add_item_3':
-			self.add_item(3)
-		elif data == 'add_item_4':
-			self.add_item(4)
-		elif data == 'add_item_5':
-			self.add_item(5)
-		elif data == 'add_item_6':
-			self.add_item(6)
+		elif data_match:
+			slot = data_match.group('slot')
+			print("VendingMachine.channel_handler() | data: {} | slot: {}".format(data, slot))
+			self.add_item(slot)
 		else:
-			print("VendingMachine.channel_handler() | data:", data)
+			# print("VendingMachine.channel_handler() | data:", data)
+			self.make_purchase()
 
 
 	def add_item(self, slot):
 		ref = "vendingmachine001:slot{}".format(slot)
 		print("VendingMachine.add_item() | slot: {} | ref: {}".format(slot, ref))
-		count = self.redis.hincrby("{} count".format(ref), 1)
+
+		count = self.redis.hincrby(ref, 'count', 1)
+		# self.redis.hset(ref, 'count', count)
+
 		result = self.redis.hgetall("{}".format(ref))
+		name = result[b'name'].decode()
+		price = float(result[b'price'].decode())
 		print("VendingMachine.add_item() | count: {} | result: {}".format(count, result))
-		self.display.slots[slot] = "{}: ${:.2f} × {}".format(result[b'name'].decode(), float(result[b'price'].decode()), count)
+
+		self.display.slots[int(slot)] = "{}: ${:.2f} × {}".format(name, price, count)
 
 
-	def redis_link(self):
-		self.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
-		self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
-		self.pubsub.subscribe(**{'vendingmachine001-channel': self.channel_handler})
-		self.thread = self.pubsub.run_in_thread(sleep_time=0.001)
+	def make_purchase(self):
+		print("VendingMachine.make_purchase()")
+		data = self.redis_getall()
+		# print("VendingMachine.make_purchase() | data: {}".format(data))
+		total_cost = 0.0
 
+		first = True
+		for datum in data:
+			if first:
+				amount = float(datum.decode())
+				self.display.amount = "${:.2f}".format(amount)
+				first = False
+			else:
+				name = datum[b'name'].decode()
+				price = float(datum[b'price'].decode())
+				count = datum[b'count'].decode()
+				print("VendingMachine.make_purchase() | datum: {}: ${:.2f} × {}".format(name, price, count))
+				if int(count) > 0:
+					total_cost += price * count
+
+		print("VendingMachine.make_purchase() | total_cost: ${:.2f}: | amount: ${:.2f}".format(total_cost, amount))
+
+
+	def redis_getall(self):
 		pipe = self.redis.pipeline()
 		pipe.get("vendingmachine001:amount")
 		pipe.hgetall("vendingmachine001:slot1")
@@ -99,6 +116,17 @@ class VendingMachine(App):
 		pipe.hgetall("vendingmachine001:slot5")
 		pipe.hgetall("vendingmachine001:slot6")
 		data = pipe.execute()
+
+		return data
+
+
+	def redis_link(self):
+		self.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
+		self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
+		self.pubsub.subscribe(**{'vendingmachine001-channel': self.channel_handler})
+		self.thread = self.pubsub.run_in_thread(sleep_time=0.001)
+
+		data = self.redis_getall()
 
 		count = 0
 		for datum in data:

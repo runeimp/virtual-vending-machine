@@ -42,6 +42,10 @@ class VendingDisplay(BoxLayout):
 		self.redis.publish('vendingmachine001-channel', 'add_two_bits')
 
 
+	def make_purchase(self):
+		self.redis.publish('vendingmachine001-channel', 'make_purchase')
+
+
 	def redis_link(self):
 		self.redis = redis.StrictRedis(host='localhost', port=6379, db=0)
 		self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
