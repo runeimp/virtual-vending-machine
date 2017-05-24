@@ -60,6 +60,7 @@ class VendingMachine(App):
 		self.display.slots[int(slot)] = "{}: ${:.2f} × {}".format(name, price, count)
 
 		self.update_display()
+		self.redis.publish('vendingremote-channel', 'item_added')
 
 
 	def build(self):
@@ -73,49 +74,36 @@ class VendingMachine(App):
 
 
 	def channel_handler(self, message):
-		# print("VendingMachine.channel_handler() | message: {}".format(message))
 		data = message['data'].decode()
-		# print("VendingMachine.channel_handler() | data: {}".format(data))
 		data_match = re.search('add_item_(?P<slot>[0-9]+)', data)
 
 		if data == 'add_two_bits':
-			# print("  VendingMachine.channel_handler() | amount: {}".format(self.redis.get("vendingmachine001:amount")))
 			result = self.redis.incrbyfloat("vendingmachine001:amount", 0.25)
-			# print("  VendingMachine.channel_handler() | result: {}".format(result))
-			# self.display.amount = "${:.2f}".format(result)
+			self.redis.publish('vendingremote-channel', 'money_added')
 		elif data_match:
 			slot = data_match.group('slot')
-			# print("VendingMachine.channel_handler() | data: {} | slot: {}".format(data, slot))
 			self.add_item(slot)
 		else:
-			# print("VendingMachine.channel_handler() | data:", data)
 			self.make_purchase()
 
 		self.update_display()
 
 
 	def check_purchasable(self):
-		# print("VendingMachine.check_purchasable()")
-
 		data = self.redis_getall()
-		# print("VendingMachine.check_purchasable() | data: {}".format(data))
 		self.total_cost = 0.0
 
 		first = True
 		for datum in data:
 			if first:
 				self.amount = datum
-				# self.display.amount = "${:.2f}".format(self.amount)
 				first = False
 			else:
 				name = datum['name']
 				price = datum['price']
 				count = datum['count']
 				if int(count) > 0:
-					# print("VendingMachine.check_purchasable() | datum: {}: ${:.2f} × {}".format(name, price, count))
 					self.total_cost += price * float(count)
-
-		# self.display.total_cost = "${:.2f}".format(self.total_cost)
 
 		if self.total_cost == 0.0 or self.total_cost <= self.amount:
 			self.display.amount_color = (0, 0, 0, 1)
@@ -128,14 +116,9 @@ class VendingMachine(App):
 
 
 	def make_purchase(self):
-		# print("VendingMachine.make_purchase()")
-		
 		result = self.check_purchasable()
 
-		# print("VendingMachine.make_purchase() | total_cost: ${:.2f}: | amount: ${:.2f}".format(self.total_cost, self.amount))
-
 		if result:
-			# print("VendingMachine.make_purchase() | Success!")
 			self.amount = self.amount - self.total_cost
 			self.total_cost = 0
 
@@ -148,6 +131,14 @@ class VendingMachine(App):
 			pipe.hset("vendingmachine001:slot5", 'count', 0)
 			pipe.hset("vendingmachine001:slot6", 'count', 0)
 			pipe.execute()
+
+			self.redis.publish('vendingremote-channel', 'purchase_complete')
+		else:
+			self.redis.publish('vendingremote-channel', 'clear_feedback')
+
+
+	def on_pause(self):
+		self.thread.stop()
 
 
 	def on_resume(self):
@@ -178,6 +169,7 @@ class VendingMachine(App):
 				first = False
 			else:
 				obj = {
+					'id': datum[b'id'].decode(),
 					'name': datum[b'name'].decode(),
 					'price': float(datum[b'price'].decode()),
 					'count': datum[b'count'].decode()

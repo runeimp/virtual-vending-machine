@@ -43,3 +43,8 @@ Database and communications hub.
 * amount of money inserted (so we can display this info on the vending machine screen)
 
 
+Testing
+-------
+
+I've setup a Makefile to run tasks. Simply run `make` to get a list of options.
+

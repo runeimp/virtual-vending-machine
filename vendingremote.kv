@@ -39,4 +39,29 @@
         CustButton:
             text: 'Purchase'
             on_press: root.make_purchase()
+
+    BoxLayout:
+        height: 40
+        orientation: 'horizontal'
+        size_hint_y: None
+        spacing: 10
+
+        Label:
+            font_size: 24
+            height: 40
+            multiline: False
+            size_hint_y: None
+            text: 'Feedback:'
+
+        TextInput:
+            allow_copy: False
+            font_size: 24
+            height: 40
+            id: feedback
+            multiline: False
+            readonly: True
+            size_hint_x: None
+            size_hint_y: None
+            text: root.feedback
+            width: 240
     

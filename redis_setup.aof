@@ -1,4 +1,3 @@
-FLUSHDB
 SET vendingmachine001:amount 0.00
 HMSET vendingmachine001:slot1 id "baby_elephant" name "Baby Elephants" price 1.25 count 0
 HMSET vendingmachine001:slot2 id "clown_nose" name "Clown Noses" price 0.25 count 0
