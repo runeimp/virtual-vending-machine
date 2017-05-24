@@ -16,6 +16,8 @@ import redis
 
 Config.set('graphics', 'width', '400')
 Config.set('graphics', 'height', '700')
+# Config.set('graphics', 'left', '800')
+# Config.set('graphics', 'top', '300')
 
 
 class VendingDisplay(BoxLayout):
@@ -34,7 +36,6 @@ class VendingDisplay(BoxLayout):
 
 
 	def add_item(self, item):
-		print("VendingDisplay.add_item() | item: {}".format(item))
 		self.redis.publish('vendingmachine001-channel', "add_item_{}".format(item))
 
 

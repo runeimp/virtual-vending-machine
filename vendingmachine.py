@@ -17,6 +17,8 @@ import redis
 
 Config.set('graphics', 'width', '400')
 Config.set('graphics', 'height', '700')
+# Config.set('graphics', 'left', '300')
+# Config.set('graphics', 'top', '300')
 
 
 class VendingDisplay(BoxLayout):
@@ -32,6 +34,8 @@ class VendingDisplay(BoxLayout):
 			6: '',
 		}
 	)
+	total_cost = ObjectProperty('$0.13')
+
 
 class VendingMachine(App):
 	amount = 0.0
@@ -55,7 +59,7 @@ class VendingMachine(App):
 
 		self.display.slots[int(slot)] = "{}: ${:.2f} × {}".format(name, price, count)
 
-		self.check_purchasable()
+		self.update_display()
 
 
 	def build(self):
@@ -63,7 +67,7 @@ class VendingMachine(App):
 
 		self.redis_link()
 
-		self.check_purchasable()
+		self.update_display()
 		
 		return self.display
 
@@ -78,8 +82,7 @@ class VendingMachine(App):
 			# print("  VendingMachine.channel_handler() | amount: {}".format(self.redis.get("vendingmachine001:amount")))
 			result = self.redis.incrbyfloat("vendingmachine001:amount", 0.25)
 			# print("  VendingMachine.channel_handler() | result: {}".format(result))
-			self.display.amount = "${:.2f}".format(result)
-			self.check_purchasable()
+			# self.display.amount = "${:.2f}".format(result)
 		elif data_match:
 			slot = data_match.group('slot')
 			# print("VendingMachine.channel_handler() | data: {} | slot: {}".format(data, slot))
@@ -87,6 +90,8 @@ class VendingMachine(App):
 		else:
 			# print("VendingMachine.channel_handler() | data:", data)
 			self.make_purchase()
+
+		self.update_display()
 
 
 	def check_purchasable(self):
@@ -100,7 +105,7 @@ class VendingMachine(App):
 		for datum in data:
 			if first:
 				self.amount = datum
-				self.display.amount = "${:.2f}".format(self.amount)
+				# self.display.amount = "${:.2f}".format(self.amount)
 				first = False
 			else:
 				name = datum['name']
@@ -109,6 +114,8 @@ class VendingMachine(App):
 				if int(count) > 0:
 					# print("VendingMachine.check_purchasable() | datum: {}: ${:.2f} × {}".format(name, price, count))
 					self.total_cost += price * float(count)
+
+		# self.display.total_cost = "${:.2f}".format(self.total_cost)
 
 		if self.total_cost == 0.0 or self.total_cost <= self.amount:
 			self.display.amount_color = (0, 0, 0, 1)
@@ -125,13 +132,12 @@ class VendingMachine(App):
 		
 		result = self.check_purchasable()
 
-		print("VendingMachine.make_purchase() | total_cost: ${:.2f}: | amount: ${:.2f}".format(self.total_cost, self.amount))
+		# print("VendingMachine.make_purchase() | total_cost: ${:.2f}: | amount: ${:.2f}".format(self.total_cost, self.amount))
 
 		if result:
-			print("VendingMachine.make_purchase() | Success!")
+			# print("VendingMachine.make_purchase() | Success!")
 			self.amount = self.amount - self.total_cost
 			self.total_cost = 0
-
 
 			pipe = self.redis.pipeline()
 			pipe.set("vendingmachine001:amount", self.amount)
@@ -142,8 +148,6 @@ class VendingMachine(App):
 			pipe.hset("vendingmachine001:slot5", 'count', 0)
 			pipe.hset("vendingmachine001:slot6", 'count', 0)
 			pipe.execute()
-
-			self.update_display()
 
 
 	def on_resume(self):
@@ -193,6 +197,8 @@ class VendingMachine(App):
 
 
 	def update_display(self):
+		self.check_purchasable()
+
 		data = self.redis_getall()
 
 		count = 0
@@ -201,9 +207,11 @@ class VendingMachine(App):
 				self.amount = datum
 				self.display.amount = "${:.2f}".format(self.amount)
 			else:
-				print("VendingMachine.redis_link() | datum:", datum)
+				# print("VendingMachine.redis_link() | datum:", datum)
 				self.display.slots[count] = "{}: ${:.2f} × {}".format(datum['name'], datum['price'], datum['count'])
 			count += 1
+
+		self.display.total_cost = "${:.2f}".format(self.total_cost)
 
 
 if __name__ == "__main__":
