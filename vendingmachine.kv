@@ -7,36 +7,38 @@
 
 
 <VendingDisplay>:
-    id: machine
     # display: amount
+    id: machine
+    orientation: 'vertical'
     padding: 20
     spacing: 20
-    orientation: 'vertical'
 
     BoxLayout:
+        height: 40
         orientation: 'horizontal'
         size_hint_y: None
-        height: 40
         spacing: 10
 
         Label:
-            text: 'Amount:'
             font_size: 24
+            height: 40
             multiline: False
             size_hint_x: None
             size_hint_y: None
+            text: 'Amount:'
             width: 100
-            height: 40
 
         TextInput:
-            halign: 'right'
-            readonly: True
-            id: amount
+            allow_copy: False
             font_size: 24
-            multiline: False
-            text: root.amount
-            size_hint_y: None
+            foreground_color: root.amount_color
+            halign: 'right'
             height: 40
+            id: amount
+            multiline: False
+            readonly: True
+            size_hint_y: None
+            text: root.amount
 
     BoxLayout:
         orientation: 'vertical'
