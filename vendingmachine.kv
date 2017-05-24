@@ -1,0 +1,82 @@
+# File name: vendingmachine.py
+#:kivy 1.10.0
+
+<CustButton@Button>:
+    font_size: 24
+    halign: 'right'
+
+
+<VendingDisplay>:
+    # display: amount
+    id: machine
+    orientation: 'vertical'
+    padding: 20
+    spacing: 20
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        CustButton:
+            text: root.slots[1]
+        CustButton:
+            text: root.slots[2]
+        CustButton:
+            text: root.slots[3]
+        CustButton:
+            text: root.slots[4]
+        CustButton:
+            text: root.slots[5]
+        CustButton:
+            text: root.slots[6]
+
+    BoxLayout:
+        height: 40
+        orientation: 'horizontal'
+        size_hint_y: None
+        spacing: 10
+
+        Label:
+            font_size: 24
+            height: 40
+            multiline: False
+            size_hint_y: None
+            text: 'Credit Amount:'
+
+        TextInput:
+            allow_copy: False
+            font_size: 24
+            foreground_color: root.amount_color
+            height: 40
+            id: amount
+            multiline: False
+            readonly: True
+            size_hint_x: None
+            size_hint_y: None
+            text: root.amount
+            width: 100
+
+    BoxLayout:
+        height: 40
+        orientation: 'horizontal'
+        size_hint_y: None
+        spacing: 10
+
+        Label:
+            font_size: 24
+            height: 40
+            multiline: False
+            size_hint_y: None
+            text: 'Total Cost:'
+
+        TextInput:
+            allow_copy: False
+            font_size: 24
+            height: 40
+            id: total_cost
+            multiline: False
+            readonly: True
+            size_hint_x: None
+            size_hint_y: None
+            text: root.total_cost
+            width: 100
+    
